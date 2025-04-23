@@ -2,15 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Walid's Dino Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>Walid's Escape</title>
   <style>
-    body {
+    html, body {
       margin: 0;
       padding: 0;
+      overflow: hidden;
+      height: 100%;
+      touch-action: none; /* Penting untuk mencegah geser */
       font-family: Arial, sans-serif;
       background-color: #000;
-      background-size: cover;
     }
 
     #container {
@@ -18,7 +20,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      height: 100%;
     }
 
     canvas {
@@ -26,12 +28,16 @@
       border: 5px solid #000;
       border-radius: 15px;
       display: none;
+      width: 90vw;
+      height: auto;
+      max-width: 800px;
+      aspect-ratio: 8 / 3;
     }
 
     h1 {
       color: white;
-      font-size: 48px;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+      font-size: 36px;
+      text-align: center;
       margin-bottom: 10px;
     }
 
@@ -41,7 +47,6 @@
       padding: 20px;
       border-radius: 10px;
       margin-bottom: 20px;
-      max-width: 500px;
       text-align: center;
     }
 
@@ -64,12 +69,12 @@
   <div id="container">
     <h1>Walid's Escape</h1>
     <div id="instructions">
-      <p>Tekan <b>Spasi</b> untuk melompat dan hindari rintangan!</p>
-      <p>Game akan dimulai setelah kamu menekan tombol Jauhkan Walid dari Dewi <b>Start</b>.</p>
+      <p>Tekan <b>Spasi</b> atau <b>Tap layar</b> untuk melompat dan hindari rintangan!</p>
+      <p>Tekan tombol <b>Start Game</b> untuk mulai.</p>
     </div>
     <button id="startButton">Start Game</button>
     <canvas id="gameCanvas" width="800" height="300"></canvas>
-    <audio id="successSound" src="audio.mp3" preload="auto"></audio>
+    <audio id="successSound" src="ssstik (mp3cut.net).mp3" preload="auto"></audio>
   </div>
 
   <script>
@@ -84,6 +89,8 @@
 
     const obstacleImage = new Image();
     obstacleImage.src = "https://i.ytimg.com/vi/ozn27T5gouQ/maxresdefault.jpg";
+
+    let scale = canvas.width / canvas.clientWidth;
 
     let walid = {
       x: 50,
@@ -113,7 +120,7 @@
     }
 
     function addObstacle() {
-      const height = 230; // fix height
+      const height = 230;
       obstacles.push({
         x: canvas.width,
         y: height,
@@ -129,7 +136,7 @@
           obstacles.splice(i, 1);
           passedObstacles++;
           i--;
-          successSound.play(); // Play sound when successfully passed
+          successSound.play();
         }
       }
     }
@@ -156,7 +163,7 @@
         ) {
           isGameOver = true;
           alert("Game Over! Walid terkena rintangan.");
-          window.location.reload(); // Restart game
+          window.location.reload();
         }
       }
     }
@@ -185,12 +192,22 @@
       }
     }
 
+    // Keyboard
     document.addEventListener("keydown", (e) => {
       if (e.code === "Space" && isGameStarted && !walid.isJumping) {
         walid.isJumping = true;
       }
     });
 
+    // Touch (tap seluruh layar)
+    document.body.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      if (isGameStarted && !walid.isJumping) {
+        walid.isJumping = true;
+      }
+    }, { passive: false });
+
+    // Start Game
     startButton.addEventListener("click", () => {
       isGameStarted = true;
       instructions.style.display = "none";
